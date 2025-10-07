@@ -12,6 +12,7 @@ import (
 
 	_ "embed"
 )
+
 //go:embed spec/app-create-schema.json
 var appCreateSchemaJSON []byte
 
@@ -247,7 +248,7 @@ func (a *AppPlatformTool) updateApp(ctx context.Context, req mcp.CallToolRequest
 }
 
 func (a *AppPlatformTool) Tools() []server.ServerTool {
-    tools := []server.ServerTool{
+	tools := []server.ServerTool{
 		{
 			Handler: a.getDeploymentStatus,
 			Tool: mcp.NewTool("apps-get-deployment-status",
@@ -297,5 +298,3 @@ func (a *AppPlatformTool) Tools() []server.ServerTool {
 
 	return tools
 }
-
-

@@ -12,6 +12,7 @@ import (
 
 	_ "embed"
 )
+
 //go:embed spec/cluster-create-schema.json
 var clusterCreateSchemaJSON []byte
 
@@ -706,7 +707,7 @@ func getDayFromString(day string) int {
 
 // Tools returns the tools provided by this tool
 func (d *DoksTool) Tools() []server.ServerTool {
-    return []server.ServerTool{
+	return []server.ServerTool{
 		{
 			Handler: d.getDoksCluster,
 			Tool: mcp.NewTool("doks-get-cluster",
@@ -849,5 +850,3 @@ func (d *DoksTool) Tools() []server.ServerTool {
 		},
 	}
 }
-
-
