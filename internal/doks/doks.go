@@ -4,14 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/digitalocean/godo"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+
+	_ "embed"
 )
+//go:embed spec/cluster-create-schema.json
+var clusterCreateSchemaJSON []byte
+
+//go:embed spec/node-pool-create-schema.json
+var nodePoolCreateSchemaJSON []byte
 
 type DoksTool struct {
 	client *godo.Client
@@ -701,18 +706,7 @@ func getDayFromString(day string) int {
 
 // Tools returns the tools provided by this tool
 func (d *DoksTool) Tools() []server.ServerTool {
-
-	clusterCreateSchema, err := loadSchema("cluster-create-schema.json")
-	if err != nil {
-		panic(fmt.Errorf("failed to load cluster create schema: %w", err))
-	}
-
-	nodePoolCreateSchema, err := loadSchema("node-pool-create-schema.json")
-	if err != nil {
-		panic(fmt.Errorf("failed to load node pool create schema: %w", err))
-	}
-
-	return []server.ServerTool{
+    return []server.ServerTool{
 		{
 			Handler: d.getDoksCluster,
 			Tool: mcp.NewTool("doks-get-cluster",
@@ -731,7 +725,7 @@ func (d *DoksTool) Tools() []server.ServerTool {
 		{
 			Handler: d.createDOKSCluster,
 			Tool: mcp.NewToolWithRawSchema("doks-create-cluster",
-				"Create a new DigitalOcean Kubernetes cluster", clusterCreateSchema,
+				"Create a new DigitalOcean Kubernetes cluster", clusterCreateSchemaJSON,
 			),
 		},
 		{
@@ -785,7 +779,7 @@ func (d *DoksTool) Tools() []server.ServerTool {
 		{
 			Handler: d.createDOKSNodePool,
 			Tool: mcp.NewToolWithRawSchema("doks-create-nodepool",
-				"Create a new node pool in a DigitalOcean Kubernetes cluster", nodePoolCreateSchema,
+				"Create a new node pool in a DigitalOcean Kubernetes cluster", nodePoolCreateSchemaJSON,
 			),
 		},
 		{
@@ -856,17 +850,4 @@ func (d *DoksTool) Tools() []server.ServerTool {
 	}
 }
 
-// loadSchema attempts to load the JSON schema from the specified file.
-func loadSchema(file string) ([]byte, error) {
-	executablePath, err := os.Executable()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get executable path: %w", err)
-	}
 
-	executableDir := filepath.Dir(executablePath)
-	schema, err := os.ReadFile(filepath.Join(executableDir, file))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read schema file %s: %w", file, err)
-	}
-	return schema, nil
-}
