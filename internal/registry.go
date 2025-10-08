@@ -134,9 +134,11 @@ func registerDatabasesTools(s *server.MCPServer, c *godo.Client) error {
 func Register(logger *slog.Logger, s *server.MCPServer, c *godo.Client, servicesToActivate ...string) error {
 	if len(servicesToActivate) == 0 {
 		logger.Warn("no services specified, loading all supported services")
+		services := make([]string, 0, len(supportedServices))
 		for k := range supportedServices {
-			servicesToActivate = append(servicesToActivate, k)
+			services = append(services, k)
 		}
+		servicesToActivate = services
 	}
 	for _, svc := range servicesToActivate {
 		logger.Debug(fmt.Sprintf("Registering tool and resources for service: %s", svc))
